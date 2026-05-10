@@ -108,11 +108,11 @@ void NFDWidgetAdvanced::on_toolButtonSave_clicked()
 {
     QString sSaveFileName = XBinary::getResultFileName(m_pDevice, QString("%1.txt").arg(QString("NFD")));
 
-    QString _sFileName = QFileDialog::getSaveFileName(this, tr("Save"), sSaveFileName, QString("%1 (*.txt);;%2 (*)").arg(tr("Text files"), tr("All files")));
+    QString _sFileName = QFileDialog::getSaveFileName(this, tr("Save"), sSaveFileName, QString("%1 (*.txt);;%2 (*)").arg(tr("Text files")).arg(tr("All files")));
 
     if (!_sFileName.isEmpty()) {
-        if (!XOptions::saveTreeView(ui->treeViewScan, sSaveFileName)) {
-            QMessageBox::critical(XOptions::getMainWidget(this), tr("Error"), QString("%1: %2").arg(tr("Cannot save file"), _sFileName));
+        if (!XOptions::saveTreeView(ui->treeViewScan, _sFileName)) {
+            QMessageBox::critical(XOptions::getMainWidget(this), tr("Error"), QString("%1: %2").arg(tr("Cannot save file")).arg(_sFileName));
         }
     }
 }
