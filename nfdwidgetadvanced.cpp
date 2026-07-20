@@ -36,39 +36,38 @@ NFDWidgetAdvanced::NFDWidgetAdvanced(QWidget *pParent) : XShortcutsWidget(pParen
     ui->toolButtonSave->setToolTip(tr("Save"));
     ui->toolButtonScan->setToolTip(tr("Scan"));
 
-    this->m_pDevice = nullptr;
-    this->m_fileType = XBinary::FT_UNKNOWN;
+    m_inData = {};
 
     ui->comboBoxFlags->setData(XScanEngine::getScanFlags(), XComboBoxEx::CBTYPE_FLAGS, 0, tr("Flags"));
 }
 
 NFDWidgetAdvanced::~NFDWidgetAdvanced()
 {
+    XFormats::removeDevice(m_inData.pDevice, m_inData);
     delete ui;
+}
+
+void NFDWidgetAdvanced::setData(const XBinary::INDATA &inData, bool bScan)
+{
+    XFormats::removeDevice(m_inData.pDevice, m_inData);
+    m_inData = inData;
+    m_inData.pDevice = XFormats::createDevice(inData);
+
+    XFormats::setFileTypeComboBox(m_inData.fileType, m_inData.pDevice, ui->comboBoxType, XBinary::TL_OPTION_ALL);
+
+    if (bScan) {
+        process();
+    }
 }
 
 void NFDWidgetAdvanced::setData(QIODevice *pDevice, bool bScan, XBinary::FT fileType)
 {
-    this->m_pDevice = pDevice;
-    this->m_fileType = fileType;
-
-    XFormats::setFileTypeComboBox(fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_ALL);
-
-    if (bScan) {
-        process();
-    }
+    setData(XFormats::createINDATA(fileType, pDevice), bScan);
 }
 
 void NFDWidgetAdvanced::setData(const QString &sFileName, const XScanEngine::SCAN_OPTIONS &scanOptions, bool bScan)
 {
-    this->m_sFileName = sFileName;
-    this->m_fileType = scanOptions.fileType;
-
-    XFormats::setFileTypeComboBox(scanOptions.fileType, sFileName, ui->comboBoxType, XBinary::TL_OPTION_ALL);
-
-    if (bScan) {
-        process();
-    }
+    setData(XFormats::createINDATA(scanOptions.fileType, sFileName), bScan);
 }
 
 void NFDWidgetAdvanced::adjustView()
@@ -106,7 +105,7 @@ void NFDWidgetAdvanced::registerShortcuts(bool bState)
 
 void NFDWidgetAdvanced::on_toolButtonSave_clicked()
 {
-    QString sSaveFileName = XBinary::getResultFileName(m_pDevice, QString("%1.txt").arg(QString("NFD")));
+    QString sSaveFileName = XBinary::getResultFileName(m_inData.pDevice, QString("%1.txt").arg(QString("NFD")));
 
     QString _sFileName = QFileDialog::getSaveFileName(this, tr("Save"), sSaveFileName, QString("%1 (*.txt);;%2 (*)").arg(tr("Text files")).arg(tr("All files")));
 
@@ -145,11 +144,7 @@ void NFDWidgetAdvanced::process()
     XDialogProcess ds(this, &scanEngineProcess);
     ds.setGlobal(getShortcuts(), getGlobalOptions());
 
-    if (m_pDevice) {
-        scanEngineProcess.setData(m_pDevice, &scanOptions, &scanResult, ds.getPdStruct());
-    } else {
-        scanEngineProcess.setData(m_sFileName, &scanOptions, &scanResult, ds.getPdStruct());
-    }
+    scanEngineProcess.setData(m_inData.pDevice, &scanOptions, &scanResult, ds.getPdStruct());
 
     ds.start();
     ds.showDialogDelay();

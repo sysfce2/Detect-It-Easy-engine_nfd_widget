@@ -25,6 +25,7 @@
 #include "xdialogprocess.h"
 #include "xshortcutswidget.h"
 #include "scanitemmodel.h"
+#include "xformats.h"
 
 namespace Ui {
 class NFDWidgetAdvanced;
@@ -37,6 +38,7 @@ public:
     explicit NFDWidgetAdvanced(QWidget *pParent = nullptr);
     ~NFDWidgetAdvanced();
 
+    void setData(const XBinary::INDATA &inData, bool bScan = false);
     void setData(QIODevice *pDevice, bool bScan, XBinary::FT fileType);
     void setData(const QString &sFileName, const XScanEngine::SCAN_OPTIONS &scanOptions, bool bScan);
     // TODO Memory scan
@@ -57,9 +59,7 @@ protected:
 
 private:
     Ui::NFDWidgetAdvanced *ui;
-    QIODevice *m_pDevice;
-    QString m_sFileName;
-    XBinary::FT m_fileType;
+    XBinary::INDATA m_inData;
 };
 
 #endif  // NFDWIDGETADVANCED_H
