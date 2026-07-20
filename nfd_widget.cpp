@@ -24,7 +24,3 @@ NFD_Widget::NFD_Widget(QWidget *pParent) : XScanEngineWidget(pParent)
 {
     setEngine(&m_specAbstract);
 }
-
-NFD_Widget::~NFD_Widget()
-{
-}

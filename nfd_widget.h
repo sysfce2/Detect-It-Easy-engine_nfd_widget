@@ -29,7 +29,6 @@ class NFD_Widget : public XScanEngineWidget {
 
 public:
     explicit NFD_Widget(QWidget *pParent = nullptr);
-    ~NFD_Widget();
 
 private:
     SpecAbstract m_specAbstract;
