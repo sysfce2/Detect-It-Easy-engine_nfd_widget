@@ -43,6 +43,7 @@ NFDWidgetAdvanced::NFDWidgetAdvanced(QWidget *pParent) : XShortcutsWidget(pParen
 
 NFDWidgetAdvanced::~NFDWidgetAdvanced()
 {
+    ui->treeViewScan->setModel(nullptr);
     XFormats::removeDevice(m_inData.pDevice, m_inData);
     delete ui;
 }
@@ -105,6 +106,10 @@ void NFDWidgetAdvanced::registerShortcuts(bool bState)
 
 void NFDWidgetAdvanced::on_toolButtonSave_clicked()
 {
+    if (!m_inData.pDevice || !ui->treeViewScan->model()) {
+        return;
+    }
+
     QString sSaveFileName = XBinary::getResultFileName(m_inData.pDevice, QString("%1.txt").arg(QString("NFD")));
 
     QString _sFileName = QFileDialog::getSaveFileName(this, tr("Save"), sSaveFileName, QString("%1 (*.txt);;%2 (*)").arg(tr("Text files")).arg(tr("All files")));
@@ -125,6 +130,10 @@ void NFDWidgetAdvanced::on_comboBoxType_currentIndexChanged(int nIndex)
 
 void NFDWidgetAdvanced::process()
 {
+    if (!m_inData.pDevice) {
+        return;
+    }
+
     XScanEngine::SCAN_RESULT scanResult = {};
     XScanEngine::SCAN_OPTIONS scanOptions = {};
 
@@ -152,6 +161,7 @@ void NFDWidgetAdvanced::process()
     QAbstractItemModel *pOldTreeModel = ui->treeViewScan->model();
 
     ScanItemModel *pModel = new ScanItemModel(&scanOptions, &(scanResult.listRecords), 1, getGlobalOptions());
+    pModel->setParent(this);
     ui->treeViewScan->setModel(pModel);
     ui->treeViewScan->expandAll();
 
