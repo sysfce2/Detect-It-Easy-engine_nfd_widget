@@ -54,7 +54,7 @@ void NFDWidgetAdvanced::setData(const XBinary::INDATA &inData, bool bScan)
     m_inData = inData;
     m_inData.pDevice = XFormats::createDevice(inData);
 
-    XFormats::setFileTypeComboBox(m_inData.fileType, m_inData.pDevice, ui->comboBoxType, XBinary::TL_OPTION_ALL);
+    XFormats::setFileTypeComboBox(m_inData.fileType, m_inData.pDevice, ui->comboBoxType, XBinary::FT_FLAG_FORMATS);
 
     if (bScan) {
         process();
